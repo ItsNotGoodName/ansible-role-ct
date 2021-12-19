@@ -1,0 +1,4 @@
+---
+ct_user: CHANGEME
+ct_path: "/home/{{ ct_user }}/ct"
+ct_compose: CHANGEME

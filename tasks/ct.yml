@@ -1,0 +1,14 @@
+---
+- name: "Create {{ ct_path }}"
+  file:
+    path: "{{ ct_path }}"
+    state: directory
+
+- name: Copy docker-compose.yml
+  copy:
+    content: "{{ ct_compose | to_nice_yaml }}"
+    dest: "{{ ct_path }}/docker-compose.yml"
+
+- name: Start docker-compose.yml
+  docker_compose:
+    project_src: "{{ ct_path }}"
