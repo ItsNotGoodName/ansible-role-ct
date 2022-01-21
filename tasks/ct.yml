@@ -12,3 +12,5 @@
 - name: Start docker-compose.yml
   docker_compose:
     project_src: "{{ ct_path }}"
+    pull: "{{ 'ct_update' in ansible_run_tags }}"
+  tags: ct_update
