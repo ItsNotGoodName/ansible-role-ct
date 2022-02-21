@@ -1,8 +1,9 @@
 ---
-- name: "Create {{ ct_path }}"
+- name: Create directories
   file:
-    path: "{{ ct_path }}"
+    path: "{{ lookup('vars', item) }}"
     state: directory
+  loop: "{{ lookup('varnames', 'ct_path', wantlist=True) }}"
 
 - name: Copy docker-compose.yml
   copy:
