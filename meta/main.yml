@@ -1,6 +1,6 @@
 galaxy_info:
   author: itsnotgoodname
-  description: Template containers via docker-compose.
+  description: Template docker-compose.
   role_name: ct
 
   # If the issue tracker for your role is not on github, uncomment the
@@ -28,8 +28,7 @@ galaxy_info:
   # https://galaxy.ansible.com/api/v1/platforms/
   #
   platforms:
-    - name: debian
-    - name: ubuntu
+    []
 
   galaxy_tags:
     []

@@ -3,16 +3,37 @@
   assert:
     that:
       - ct_compose is not search("CHANGEME")
+      - ct_path is not search("CHANGEME")
       - ct_user is not search("CHANGEME")
   tags: always
 
-- name: Install acl package for becoming unprivileged user
-  package:
-    name: acl
+- name: "Create {{ ct_path }}"
+  file:
+    path: "{{ ct_path }}"
+    state: directory
+    mode: "0755"
+    owner: "{{ ct_user }}"
+    group: "{{ ct_user }}"
   become: true
   tags: ct
 
-- import_tasks: ct.yml
-  become_user: "{{ ct_user }}"
+- name: Copy docker-compose.yml
+  copy:
+    content: "{{ ct_compose | to_nice_yaml }}"
+    dest: "{{ ct_path }}/docker-compose.yml"
+    mode: "0755"
+    owner: "{{ ct_user }}"
+    group: "{{ ct_user }}"
   become: true
   tags: ct
+
+- name: Start docker-compose.yml
+  docker_compose:
+    project_src: "{{ ct_path }}"
+    pull: "{{ 'ct_update' in ansible_run_tags }}"
+  become: true
+  tags: 
+    - ct
+    - ct_update
+    - ct_start
+  when: "'ct_start' in ansible_run_tags or 'ct_update' in ansible_run_tags"
