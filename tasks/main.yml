@@ -11,7 +11,7 @@
   file:
     path: "{{ ct_path }}"
     state: directory
-    mode: "0755"
+    mode: "{{ ct_mode }}"
     owner: "{{ ct_user }}"
     group: "{{ ct_user }}"
   become: true

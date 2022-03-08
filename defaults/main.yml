@@ -2,3 +2,5 @@
 ct_compose: CHANGEME
 ct_path: CHANGEME
 ct_user: CHANGEME
+
+ct_mode: "0750"
