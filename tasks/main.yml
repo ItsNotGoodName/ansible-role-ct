@@ -1,39 +1,65 @@
 ---
 - name: Check required variables
-  assert:
+  ansible.builtin.assert:
     that:
+      - ct_user is not search("CHANGEME")
       - ct_compose is not search("CHANGEME")
       - ct_path is not search("CHANGEME")
-      - ct_user is not search("CHANGEME")
   tags: always
 
 - name: "Create {{ ct_path }}"
-  file:
+  ansible.builtin.file:
     path: "{{ ct_path }}"
     state: directory
-    mode: "{{ ct_mode }}"
+    mode: "{{ ct_path_mode }}"
     owner: "{{ ct_user }}"
-    group: "{{ ct_user }}"
+    group: "{{ ct_group }}"
   become: true
+  tags: ct
+
+- name: "Get info on {{ ct_user }}"
+  ansible.builtin.user:
+    name: "{{ ct_user }}"
+  register: ct_user_register
+  become: true
+  tags: ct
+
+- name: Set variables
+  ansible.builtin.set_fact:
+    ct_user_uid: "{{ ct_user_register.uid }}"
+    ct_user_gid: "{{ ct_user_register.group }}"
   tags: ct
 
 - name: Copy docker-compose.yml
-  copy:
+  ansible.builtin.copy:
     content: "{{ ct_compose | to_nice_yaml }}"
     dest: "{{ ct_path }}/docker-compose.yml"
-    mode: "0755"
+    mode: "{{ ct_compose_mode }}"
     owner: "{{ ct_user }}"
-    group: "{{ ct_user }}"
+    group: "{{ ct_group }}"
   become: true
   tags: ct
 
-- name: Start docker-compose.yml
-  docker_compose:
+- name: Start/update containers
+  ansible.builtin.docker_compose:
     project_src: "{{ ct_path }}"
     pull: "{{ 'ct_update' in ansible_run_tags }}"
   become: true
-  tags: 
-    - ct
+  tags:
+    - never
     - ct_update
     - ct_start
   when: "'ct_start' in ansible_run_tags or 'ct_update' in ansible_run_tags"
+
+- name: Prune everything
+  community.docker.docker_prune:
+    containers: true
+    images: true
+    networks: true
+    volumes: true
+    builder_cache: true
+  become: true
+  tags:
+    - never
+    - ct_prune
+  when: "'ct_prune' in ansible_run_tags"

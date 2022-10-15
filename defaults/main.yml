@@ -1,6 +1,9 @@
 ---
-ct_compose: CHANGEME
-ct_path: CHANGEME
 ct_user: CHANGEME
+ct_group: "{{ ct_user }}"
 
-ct_mode: "0750"
+ct_compose: CHANGEME
+ct_compose_mode: 0600
+
+ct_path: CHANGEME
+ct_path_mode: 0750
