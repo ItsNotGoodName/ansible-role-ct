@@ -3,7 +3,6 @@
   ansible.builtin.assert:
     that:
       - ct_user is not search("CHANGEME")
-      - ct_compose is not search("CHANGEME")
       - ct_path is not search("CHANGEME")
   tags: always
 
@@ -11,7 +10,7 @@
   ansible.builtin.file:
     path: "{{ ct_path }}"
     state: directory
-    mode: "{{ ct_path_mode }}"
+    mode: "{{ ct_mode_path }}"
     owner: "{{ ct_user }}"
     group: "{{ ct_group }}"
   become: true
@@ -26,19 +25,20 @@
 
 - name: Set variables
   ansible.builtin.set_fact:
-    ct_user_uid: "{{ ct_user_register.uid }}"
-    ct_user_gid: "{{ ct_user_register.group }}"
+    ct_uid: "{{ ct_user_register.uid }}"
+    ct_gid: "{{ ct_user_register.group }}"
   tags: ct
 
-- name: Copy docker-compose.yml
+- name: Copy compose.yaml
   ansible.builtin.copy:
     content: "{{ ct_compose | to_nice_yaml }}"
-    dest: "{{ ct_path }}/docker-compose.yml"
-    mode: "{{ ct_compose_mode }}"
+    dest: "{{ ct_path }}/compose.yaml"
+    mode: "{{ ct_mode_compose }}"
     owner: "{{ ct_user }}"
     group: "{{ ct_group }}"
   become: true
   tags: ct
+  when: ct_compose != "CHANGEME"
 
 - name: Start/update containers
   ansible.builtin.docker_compose:
