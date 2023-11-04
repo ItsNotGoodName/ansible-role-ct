@@ -41,9 +41,9 @@
   when: ct_compose != "CHANGEME"
 
 - name: Start/update containers
-  ansible.builtin.docker_compose:
-    project_src: "{{ ct_path }}"
-    pull: "{{ 'ct_update' in ansible_run_tags }}"
+  ansible.builtin.shell:
+    chdir: "{{ ct_path }}"
+    cmd: "docker compose up -d {{ ('ct_update' in ansible_run_tags) | ternary('--pull always', '') }}"
   become: true
   tags:
     - never
